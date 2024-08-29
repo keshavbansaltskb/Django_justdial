@@ -1,0 +1,396 @@
+{% extends "master.html" %}
+{% block main %}
+   <style>
+        .rating span {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 2px;
+        }
+       
+  
+    </style>
+    <script>
+        $(document).ready(function(){
+            $(".headtitle").text("{{bus.title}}");
+            var link = document.createElement('link');
+            link.rel = 'icon';
+            link.type = 'icon';
+            link.href = '{{bus.image.url}}';
+            document.head.appendChild(link);
+        });
+    </script>
+    <div class="modal fade" id="AppointmentModel">
+        <div class="modal-dialog  modal-dialog-centered">
+          <div class="modal-content">
+      
+            <div class="modal-header">
+              <h4 class="modal-title">Appointment </h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <form method="post" action="/appointment/{{bus.id}}">
+                {% csrf_token %}    
+                <div class="modal-body">
+                    <label><b>Date: </b></label>
+                    <input type="date" class="form-control" required name="date"   placeholder="Select Date">
+                    <br>
+                    <label><b>Time: </b></label>
+                    <input type="time" class="form-control" required  name="time"   placeholder="Select Date">
+                </div>
+        
+                <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+          </div>
+        </div>
+    </div>
+        <div class="container"  style="margin-top:100px">
+        <div class="row">
+            {% if bus %}
+                <div class="col-lg-8">
+                    <label>
+                        <img src="{{bus.image.url}}" style="width:50px;height:50px;border-radius:50%;margin-bottom:10px">
+                        <span style="font-family:serif;color:blue;font-size:40px;margin:10px">{{bus.title}}</span>
+                    </label>
+                    <br>
+                    <label>
+                        <button class="btn btn-success  w3-padding-small">{{prating}}</button>
+                        {% for star in "12345" %}
+                            {% if star|add:"0" <= rating %}
+                                <i class="bx bxs-star" style="color: #FFD700"></i>
+                            {% else %}
+                                <i class="bx bx-star" style="color: black"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </label>
+                    <br><br>
+                    <label style="font-size:15px;font-family:sans-serif">{{bus.state}}, {{bus.district}}, India |</label>
+                    <label style="font-size:15px;font-family:sans-serif;color:green;"> Open {{bus.open_until}} |</label>
+                    <label style="font-size:15px;font-family:sans-serif;color:green;">{{bus.experience}} years in bussiness</label>
+                    <br>
+                    <button class="w3-btn w3-teal" style="margin-bottom:10px">
+                        <i class="bx bx-phone" style="cursor:pointer;font-size:20px"></i> 
+                        {{ bus.contact_number }}
+                    </button>
+                    <a href="#messagereply">
+                        <button class="w3-button"  style="font-size:15px;border:1px solid #000;color:black;margin-bottom:10px">
+                            <i class='bx bx-star' style="cursor:pointer"></i>
+                            Tap to rate
+                        </button>
+                    </a>
+                    <a href="https://wa.me/{{ bus.contact_number }}">
+                        <button class="w3-button"  style="font-size:15px;border:1px solid #000;color:black;margin-bottom:10px">
+                            <i class='bx bxl-whatsapp' style="cursor:pointer"></i> 
+                            Chat
+                        </button>
+                    </a>
+                    {% if bussinesscategory  and user %}
+                        {% if appointmentsbook %}
+                        <button class="w3-button" style="font-size:15px;border:1px solid #000;color:black;margin-bottom:10px"  data-toggle="modal" data-target="#AppointmentModel">
+                            <i class='bx bx-plus-medical' style="cursor:pointer"></i> Appointment
+                        </button>
+                        {% else %}
+                        <button class="w3-btn btn-danger" style="margin-bottom:10px">
+                            <i class='bx bx-plus-medical' style="cursor:pointer"></i> Appointment Booked
+                        </button>
+                        {% endif %}
+                    {% endif %}
+                    <br><br>
+                </div>
+                <div class="col-lg-4">
+                    {% if bus.youtube %}
+                        <div class="card">
+                            <div class="card-header text-center">
+                                Bussiness Youtube Link
+                            </div>
+                            <div class="card-body">
+                                <iframe class="img-fluid" src="{{bus.youtube}}?autoplay=1&mute=1" title="YouTube video player" frameborder="0" allowfullscreen></iframe>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="card">
+                            <div class="card-header text-center">Advertisement</div>
+                            <div class="card-body">
+                                {% if advertisement %}
+                                    <div id="slideshow" class="img-fluid">
+                                        {% for ad in advertisement %}
+                                            {% if ad.option1 %}
+                                                <img src="{{ ad.image.url }}" class="slide-img" style="display:none;width:100%;height:150px">
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                {% if gallery %}
+                    <div class="col-lg-12" style="margin:20px;font-size:20px;font-weight:bold;font-family:serif">{{bus.title}} Images:</div>
+                    {% for img in gallery %}
+
+                        <div class="col-lg-4 col-md-4 col-sm-6" style="margin-bottom:10px">
+                            <img src="{{img.image.url}}" class="img-fluid" style="width:100%;height:300px">
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                <hr><br>
+                <div id="messagereply">
+                </div>
+                <div class="col-lg-8"  style="margin-top:30px">
+                    <div class="card card-body">
+                        <label><b>Address :</b> <br> {{bus.address}} </label>
+                        <br>
+                        <label><b>Timing :</b><br>  {{bus.timing}} </label>
+                        <br>
+                        <label><b>Sevices :</b> <br> {{bus.service}} </label>
+                        <br>
+                        <label><b>Overview of  {{bus.title}} :</b>  <br> {{bus.overview}} </label>
+                    </div>
+                </div>
+                <div class="col-lg-4"  style="margin-top:30px">
+                    <div class="card">
+                        {% if reply %}
+                        <div class="text-center" >
+                            <label style="font-size:20px;font-family:serif"><b>Your review has submited</b></label>
+                        </div>
+                        {% else %}
+                        <div class="card-body">
+                            <label style="font-family:sans-serif;font-size:20px"><b>Add a review</b></label>
+                            <div class="rating">
+                                <span class="bx bx-star ratingstar" number="1"></span>
+                                <span class="bx bx-star ratingstar" number="2"></span>
+                                <span class="bx bx-star ratingstar" number="3"></span>
+                                <span class="bx bx-star ratingstar" number="4"></span>
+                                <span class="bx bx-star ratingstar" number="5"></span>
+                            </div>
+                            <input type="hidden" id="rating-value"  value="0"><br>
+                            <textarea placeholder="Write Here" id="replymessage" class="form-control" rows="5"></textarea>
+                            
+                            <label class="errormessage" style="color:red"></label><br>
+                            <button class="w3-btn btn-primary sharereply" id="{{bus.id}}">Post Review</button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-lg-12">
+                    <div class="viewmessage" style="margin-top:50px">
+                        {% if messages %}
+                        <center><label style="font-family:sans-serif;font-size:30px">Reviews & Ratings</label></center>
+                        
+                            {% for msg in messages %}
+                            <div class="row" style="margin-top: 20px; padding: 20px; border-radius: 10px; border: 1px solid #f2f2f2;">
+                                <div class="col-lg-12">
+                                    <label style="font-size: 20px; font-family: sans-serif;">Name : <span style="font-weight: 100;">{{msg.user}}</span></label>
+                                    <br>
+                                    <label style="font-size: 15px;">Rating :
+                                    {% for star in star_range %}
+                                        {% if star < msg.rating %}
+                                            <i class="bx bxs-star" style="color: #FFD700;"></i>
+                                        {% else %}
+                                            <i class="bx bx-star" style="color: black;"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </label><br>
+                                    <label style="font-size: 15px;">Message :  <span style="font-weight: 100;">{{msg.message}}</span></label><br>
+                                    
+                                </div>
+                            </div>
+
+                        {% endfor %}
+                        <div class="data">
+
+                        </div>
+                      
+                        {% if messages.has_next %}
+                            <div class="row">
+                                <div class="col-lg-12 text-center" style="margin-top:50px">
+                                    <button class="w3-btn btn-primary loadmore" id="{{bus.id}}" style="cursor: pointer;">Load More...</button>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% else %}
+                        <center><label style="font-family:sans-serif;font-size:30px">No Reviews & Ratings Till Now</label><br><br></center>
+                        {% endif %}
+                    </div>
+                    
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    <script>
+        var csrftoken = "{{ csrf_token }}";
+        $(document).ready(function() {
+            
+            $(document).on('mouseover', '.ratingstar', function() {
+                var number = parseInt($(this).attr('number'));
+                $('.ratingstar').each(function() {
+                    var starNumber = parseInt($(this).attr('number'));
+                    if (starNumber <= number) {
+                        $(this).css('color', 'blue');
+                        $(this).attr('class', 'bx bxs-star ratingstar');
+                    } else {
+                        $(this).css('color', 'black');
+                        $(this).attr('class', 'bx bx-star ratingstar');
+                    }
+                });
+            });
+            $(document).on('mouseout', '.ratingstar', function() {
+                var rating = parseInt($('#rating-value').val());
+                $('.ratingstar').each(function() {
+                    var starNumber = parseInt($(this).attr('number'));
+                    if (starNumber <= rating) {
+                        $(this).css('color', 'blue');
+                        $(this).attr('class', 'bx bxs-star ratingstar');
+                    } else {
+                        $(this).css('color', 'black');
+                        $(this).attr('class', 'bx bx-star ratingstar');
+                    }
+                });
+            });
+            $(document).on('click', '.ratingstar', function() {
+                var number = parseInt($(this).attr('number'));
+                $('#rating-value').val(number);
+
+                $('.ratingstar').each(function() {
+                    var starNumber = parseInt($(this).attr('number'));
+                    if (starNumber <= number) {
+                        $(this).css('color', 'blue');
+                    } else {
+                        $(this).css('color', 'black');
+                    }
+                });
+                $(".errormessage").css("color","red");
+                $(".errormessage").html("");
+            });
+
+        });
+        
+        $(document).on("click", ".sharereply", function() {
+            var rating = $("#rating-value").val();
+            var message = $("#replymessage").val();
+            var businessId = $(this).attr("id");
+            
+            if (rating != 0 && message.trim() !== "") {
+                $.ajax({
+                    url: "/sharereply",
+                    method: "POST",
+                    data: {
+                        rating: rating,
+                        message: message,
+                        business_id: businessId,
+                        csrfmiddlewaretoken: csrftoken
+                    },
+                    success: function(response) {
+                        
+                        /*$(".errormessage").html("Your Review Send Successffuly.");
+                        $(".errormessage").css("color","green");
+                        $(".ratingstar").css("color","black");
+                        $("#rating-value").val(0);
+                        $("#replymessage").val("");*/
+
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        $(".errormessage").css("color","red");
+                        $(".errormessage").html("You are not logged in. <a href='/login'>Login</a>");
+                    }
+                });
+            } else {
+                $(".errormessage").css("color","red");
+                $(".errormessage").text("Rating and Message should have a value.");
+            }
+        });
+        $(document).ready(function(){
+            setTimeout(function() {
+                var city = "";
+                var city = $(".iplocation").val();
+                if(city!=""){
+                    var businessId = $(".sharereply").attr("id");
+                    console.log("City value:", city);  // Logging city value to console
+                    $.ajax({
+                        url: "/adddistrict",
+                        method: "POST",
+                        data: {
+                            city: city,
+                            business_id: businessId,  
+                            csrfmiddlewaretoken: csrftoken
+                        },
+                        success: function(response) {
+                        },
+                        error: function(xhr, status, error) {                        
+                        }
+                    });
+                }
+                
+            }, 5000);
+        });
+        $(document).ready(function() {
+            var page = 2;
+
+            $(".loadmore").click(function() {
+                var id = $(this).attr("id");
+                
+                $.ajax({
+                    url: "/loadmore",
+                    method: "POST",
+                    data: {
+                        points: page,
+                        id:id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.data) {
+                            response.data.forEach(function(msg) {
+                                var htmlContent =
+                                    "<div class='row' style='margin-top: 20px; padding: 20px; border-radius: 10px; border: 1px solid #f2f2f2;'>" +
+                                        "<div class='col-lg-12'>" +
+                                            "<label style='font-size: 20px; font-family: sans-serif;'>Name : <span style='font-weight: 100;'>" + msg.name + "</span></label>" +
+                                            "<br>" +
+                                            "<label style='font-size: 15px;'>Rating : ";
+                                        for (var star = 0; star < 5; star++) {
+                                            htmlContent += "<i class='bx " + (star < msg.rating ? "bxs-star" : "bx-star") + "' style='color: " + (star < msg.rating ? "#FFD700;" : "black;") + "'></i> ";
+                                        }
+
+                                        htmlContent +=
+                                            "</label><br>" +
+                                            "<label style='font-size: 15px;'>Message : <span style='font-weight: 100;'>" + msg.message + "</span></label><br>" +
+                                            "<label style='font-size: 15px;'>Email : <span style='font-weight: 100;'>" + msg.email + "</span></label>" +
+                                        "</div>" +
+                                    "</div>";
+                                $(".data").append(htmlContent);
+                            });
+
+                            page += 1;
+                            if (!response.has_next) {
+                                $(".loadmore").hide(); 
+                            }
+                        } else if (response.error) {
+                            console.log("Error:", response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Error: " + error);
+                    }
+                });
+            });
+        });
+
+        const slides = document.querySelectorAll('#slideshow .slide-img');
+        let currentSlide = 0;
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.style.display = (i === index) ? 'block' : 'none';
+            });
+        }
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            showSlide(currentSlide);
+        }
+        showSlide(currentSlide);
+        setInterval(nextSlide, 3000);
+    </script>
+    
+{% endblock main %}
+
+    

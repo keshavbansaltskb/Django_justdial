@@ -1,0 +1,107 @@
+{% extends "master.html" %}
+{% block main %}
+    <style>
+        .categoriess{
+            width:10%;
+            cursor:pointer;
+            margin-top:20px
+        }
+        .catimg{
+            width:80px;
+            height:70px;
+            border: 1px solid #999;
+            border-radius :10px;
+            padding:10px;
+        }
+        .categoriess:hover .catimg{
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .catname{
+            color:black;
+            margin-right:40px;
+            font-weight:400;
+            font-family:sans-serif;
+            width:60px;
+            font-size:16px;
+            cursor:pointer;
+            margin-top:5px;
+            text-align:center;
+        }
+        @media only screen and (max-width:900px) {
+            .categoriess{
+                width:15%;
+            }
+        }
+        @media only screen and (max-width: 600px) {
+            .categoriess{
+                width:20%;
+            }
+            .catname{
+                font-size:14px;
+                margin-right:30px;
+            }
+        }
+    </style>
+    
+    <div class="container" style="margin-top:100px">
+        <div class="row">
+            <div class="col-lg-12">
+                <label style="font-size:20px;font-family:serif"><b>Search across <span style="color:blue">Bussiness</span></b></label><br>
+            </div>
+            
+            <div class="col-lg-6 col-sm-12 col-md-9">
+                <form method="post" action="search">
+                    {% csrf_token %}
+                    <div class="input-group" style="margin-top: 10px;">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fa fa-map-marker"></i></span>
+                        </div>
+                        <input type="text" class="form-control iplocation" name="location" placeholder="Location" required>
+                        <input type="text" style="margin-left:10px" name="business" class="form-control" placeholder="Search any Bussiness" required>
+                        <button  style="margin-left:10px"  class="w3-btn btn-primary" type="submit" id="search-button"> Search</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-6 col-md-3">
+            </div>
+            
+        </div>
+        <div class="row"  style="margin-top: 20px;">
+            
+            {% for category in cat %}
+                <div class="categoriess">
+                    <a href="/category/{{category.id}}"><img src="{{ category.image.url }}" class="img-fluid catimg"></a>
+                    <br>
+                    <a href="/category/{{category.id}}"><center><label class="catname">{{ category.category }}</label></center></a>
+                </div>
+            {% endfor %}
+            
+        </div>
+        <div class="row" style="margin-top:50px">
+            {% for category in cat %}
+            <div class="col-lg-6" style="padding:10px"   data-aos="fade-up" data-aos-duration="2000">
+                <div style="margin-top:20px;border:1px solid #d9d9d9;padding:10px">
+                    <div class="">
+                        <a href="/category/{{ category.id }}" style="color:black;margin-left:10px;font-size:20px;font-family:serif;font-weight:bold">
+                            <label style="cursor:pointer;margin-bottom:10px;line-">{{ category.category }}</label>
+                        </a>
+                    </div>
+                    <div class="row">
+                        {% for business in category.business_set.all|slice:":2"  %}
+                        <div class="col-6">
+                            <a href="/bussiness/{{ business.id }}"><img src="{{ business.image.url }}" class="img-fluid" style="cursor:pointer" >
+                            <br><br>
+                            <center><label style="cursor:pointer;color:black">{{ business.title }}</label></center></a>
+                        </div>
+                        {% empty %}
+                        <p style="margin-left:30px">No businesses available for this category.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+    </div>
+    
+{% endblock main %}

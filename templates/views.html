@@ -1,0 +1,125 @@
+{% extends "master1.html" %}
+{% block maincontent %}
+    <div class="viewchart" style="margin-top: 20px">
+        <center><label style="font-family: serif; font-size: 30px;">City Views Chart</label><br><br></center>
+        <canvas id="myChart"></canvas>
+    </div>
+    <div class="viewmessage" style="margin-top: 50px;">
+        {% if messages %}
+        <center><label style="font-family: serif; font-size: 30px;">Reviews & Ratings</label></center>
+        
+        {% for msg in messages %}
+        <div class="row" style="margin-top: 20px; padding: 20px; border-radius: 10px; border: 1px solid #f2f2f2;">
+            <div class="col-lg-12">
+                <label style="font-size: 20px; font-family: sans-serif;">Name : <span style="font-weight: 100;">{{msg.user}}</span></label>
+                <br>
+                <label style="font-size: 15px;">Rating :
+                {% for star in star_range %}
+                    {% if star < msg.rating %}
+                        <i class="fa fa-star" style="color:#FFD700;"></i>
+                    {% else %}
+                        <i class="fa fa-star-o" style="color: black;"></i>
+                    {% endif %}
+                {% endfor %}
+                </label><br>
+                <label style="font-size: 15px;">Message :  <span style="font-weight: 100;">{{msg.message}}</span></label><br>
+                <label style="font-size: 15px;">Email :  <span style="font-weight: 100;">{{msg.email}}</span></label>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="data">
+
+        </div>
+        {% if messages.has_next %}
+            <div class="row">
+                <div class="col-lg-12 text-center" style="margin-top:50px">
+                    <button class="w3-btn btn-primary loadmore" id="{{id}}" style="cursor: pointer;">Load More...</button>
+                </div>
+            </div>
+        {% endif %}
+        {% else %}
+        <center><label style="font-family: serif; font-size: 30px;">No Reviews & Ratings Till Now</label><br><br></center>
+        {% endif %}
+    </div>
+    <script>
+        const cityViewCountsJson = '{{ cityview|safe }}';
+        const cityViewCounts = JSON.parse(cityViewCountsJson);
+
+        cityViewCounts.sort((a, b) => b.count - a.count);
+
+        // Filter to get only top 6 cities
+        const topCities = cityViewCounts.slice(0, 6);
+
+        const xValues = topCities.map(item => item.city);
+        const yValues = topCities.map(item => item.count);
+
+        new Chart("myChart", {
+            type: "bar",
+            data: {
+                labels: xValues,
+                datasets: [{
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    data: yValues
+                }]
+            },
+            options: {
+                legend: { display: false },
+                title: {
+                    display: true,
+                    text: "City View Counts"
+                }
+            }
+        });
+
+        $(document).ready(function() {
+            var page = 2;
+
+            $(".loadmore").click(function() {
+                var id = $(this).attr("id");
+                $.ajax({
+                    url: "/loadmore",
+                    method: "POST",
+                    data: {
+                        points: page,
+                        id:id,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        if (response.data) {
+                            response.data.forEach(function(msg) {
+                                var htmlContent =
+                                    "<div class='row' style='margin-top: 20px; padding: 20px; border-radius: 10px; border: 1px solid #f2f2f2;'>" +
+                                        "<div class='col-lg-12'>" +
+                                            "<label style='font-size: 20px; font-family: sans-serif;'>Name : <span style='font-weight: 100;'>" + msg.name + "</span></label>" +
+                                            "<br>" +
+                                            "<label style='font-size: 15px;'>Rating : ";
+                                        for (var star = 0; star < 5; star++) {
+                                            htmlContent += "<i class='fa " + (star < msg.rating ? "fa-star" : "fa-star-o") + "' style='color: " + (star < msg.rating ? "#FFD700;" : "black;") + "'></i> ";
+                                        }
+
+                                        htmlContent +=
+                                            "</label><br>" +
+                                            "<label style='font-size: 15px;'>Message : <span style='font-weight: 100;'>" + msg.message + "</span></label><br>" +
+                                            "<label style='font-size: 15px;'>Email : <span style='font-weight: 100;'>" + msg.email + "</span></label>" +
+                                        "</div>" +
+                                    "</div>";
+                                $(".data").append(htmlContent);
+                            });
+
+                            page += 1;
+                            if (!response.has_next) {
+                                $(".loadmore").hide(); 
+                            }
+                        } else if (response.error) {
+                            console.log("Error:", response.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("Error: " + error);
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock maincontent %}

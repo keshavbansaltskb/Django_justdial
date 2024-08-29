@@ -1,0 +1,24 @@
+{% extends "master1.html" %}
+{% block maincontent %}
+    {% if userdetails %}
+            <center><label style="font-size:20px;font-family:serif"><b>Edit Your Profile</b></label></center><br><br>
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'success' %}
+                        <div class="alert alert-success text-center">{{ message }}</div>
+                    {% elif message.tags == 'warning' %}
+                        <div class="alert alert-danger text-center">{{ message }}</div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <form method="post" action="DashEditProfile">
+                {% csrf_token %}
+                <label>Name:</label>
+                <input type="text" value="{{userdetails.name}}" name="name" class="form-control"><br>
+                <label>Number:</label>
+                <input type="number" value="{{userdetails.phone}}" name="phone" class="form-control"><br>
+                <input type="submit" class="btn btn-primary" value="Submit">
+            </form>
+        {% endif %}
+    
+{% endblock maincontent %}

@@ -1,0 +1,62 @@
+{% extends "master1.html" %}
+{% block maincontent %}
+    <div class="row" style="padding:20px">
+        <div class="col-lg-12">
+            <h1 class="font-family:serif">Add your advertisement image</h1>
+            <br>
+            {% if messages %}
+                {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="alert alert-success text-center">{{ message }}</div>
+                {% elif message.tags == 'warning' %}
+                    <div class="alert alert-warning text-center">{{ message }}</div>
+                {% endif %}
+                {% endfor %}
+            
+            {% endif %}
+            <form method="POST" action="/advdata" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label style="font-size:20px">Choose an option:</label>
+                <select id="options" name="options" class="form-control" style="height:40px" required>
+                    <option value="option1">800 x 800 pixels</option>
+                    <option value="option2">500 x 900 pixels</option>
+                    <option value="option3">900 x 500 pixels</option>
+                    <option value="option4">1000 x 200 pixels</option>
+                </select>
+                <br>
+                <div class="form-group">
+                    <label  style="font-size:20px"><b>Advertisement Image</b></label>
+                    <input type="file" class="form-control-file" id="image" name="image" required>
+                </div>
+                <br>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+
+    </div>
+    <div class="row">
+        {% if advertisements %}
+            {% for ad in advertisements %}
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header text-center" style="font-size:20px">
+                            {% if ad.option1 %}
+                                Option 1: 
+                            {% elif ad.option2 %}
+                                Option 2:
+                            {% elif ad.option3 %}
+                                Option 3:
+                            {% elif ad.option4 %}
+                                Option 4:
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <img src="{{ ad.image.url }}" class="img-fluid">
+                        </div>                    
+                    </div>
+                    
+                </div>     
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock maincontent %}

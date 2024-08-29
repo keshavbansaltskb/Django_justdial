@@ -1,0 +1,37 @@
+{% extends "master.html" %}
+{% block main %}
+    <div class="container"  style="margin-top:100px">
+        <div class="row">
+            <div class="col-lg-3"></div>
+            <div class="col-lg-6">
+                {% if details %}
+                    <center><label style="font-size:20px;font-family:serif"><b>Edit Your Profile</b></label></center><br><br>
+                    {% if messages %}
+                        
+                        {% for message in messages %}
+                        {% if message.tags == 'success' %}
+                            <div class="alert alert-success text-center">{{ message }}</div>
+                        {% elif message.tags == 'warning' %}
+                            <div class="alert alert-danger text-center">{{ message }}</div>
+                        {% endif %}
+                        {% endfor %}
+                    
+                    {% endif %}
+                    <form method="post" action="editprofile">
+                        {% csrf_token %}
+                        <label>Name:</label>
+                        <input type="text" value="{{details.name}}" name="name" class="form-control"><br>
+                        <label>Number:</label>
+                        <input type="number" value="{{details.phone}}" name="phone" class="form-control"><br>
+                        <input type="submit" class="w3-btn btn-primary" value="Submit">
+                    </form>
+                {% endif %}
+                
+            </div>
+            <div class="col-lg-3"></div>
+        </div>
+    </div>
+    
+{% endblock main %}
+
+    

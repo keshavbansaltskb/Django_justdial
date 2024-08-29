@@ -1,0 +1,43 @@
+{% extends "master1.html" %}
+{% block maincontent %}
+    <div class="row">
+        <div class="col-lg-12">
+            <center><label style="font-size:20px;font-weight:bold">Gallery </label></center>
+            <br>
+            {% if messages %}
+                {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class="alert alert-success text-center">{{ message }}</div>
+                {% elif message.tags == 'warning' %}
+                    <div class="alert alert-warning text-center">{{ message }}</div>
+                {% endif %}
+                {% endfor %}
+            
+            {% endif %}
+            <form method="post" action="/galleryimg"  enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label  style="font-size:20px"><b>Upload Image</b></label>
+                    <input type="file" class="form-control-file" id="image" name="image" >
+                </div>
+                <input type="submit" class="btn btn-primary" value="Submit">
+            </form>
+        </div>
+    </div>
+    <div class="row" style="margin-top:20px">
+        {% if gallery %}
+            <div class="col-lg-12" style="margin-bottom:20px">
+                <center><label style="font-size:20px;font-weight:bold">Your gallery Images</label></center>
+            </div>
+            {% for img in gallery %}
+                <div class="col-lg-4">
+                    <img src="{{ img.image.url }}" class="img-fluid">
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-lg-12">
+                <center><label style="font-size:20px;font-weight:bold">Your gallery is empty</label></center>
+            </div>
+        {% endif %}
+    </div>
+{% endblock maincontent %}

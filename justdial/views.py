@@ -366,6 +366,39 @@ def sharereply(request):
     
     return JsonResponse({'error': 'Method not allowed.'})
 
+# Comment and rating url 
+@csrf_protect
+def updatereply(request):
+    if request.method == "POST":
+        rating = int(request.POST.get("rating"))
+        message_content = request.POST.get("message")
+        business_id = int(request.POST.get("business_id"))
+        cid = int(request.POST.get("cid"))
+        user_email = request.COOKIES.get("user")
+        if user_email:
+            user_details = get_object_or_404(Signup, email=user_email)
+            username = user_details.name
+            
+            message = get_object_or_404(Message, id=cid, business_id=business_id, email=user_email)
+                
+                # Update the message record
+            message.rating = rating
+            message.message = message_content
+            message.save()
+            
+            response_data = {
+                'status': 'success'
+            }
+            
+            return JsonResponse(response_data)
+        else:
+            response_data = {
+                'status': 'error'
+            }
+            return JsonResponse(response_data, status=401)
+    
+    return JsonResponse({'error': 'Method not allowed.'})
+
 
 # Dashboard Bussiness
 def dashboard(request):
@@ -496,6 +529,7 @@ def loadmore(request):
         data = []
         for msg in page_obj.object_list:
             data.append({
+                'id': msg.id,
                 'name': msg.user,
                 'rating': msg.rating,
                 'message': msg.message,
@@ -650,11 +684,13 @@ def gallery(request):
     user = request.COOKIES.get('user')
     if user:
         bussinessid = Business.objects.get(email=user).id
+        bussiness = Business.objects.get(email=user)
         gallery = ""
         if Gallery.objects.filter(business_id=bussinessid).exists():
             gallery = Gallery.objects.filter(business_id=bussinessid)
         data = {
-            "gallery":gallery
+            "gallery":gallery,
+            "bus":bussiness
         }
         return render(request,"gallery.html",data)
 
@@ -680,6 +716,13 @@ def galleryimg(request):
         return redirect("/Gallery")
     return redirect("/")
 
+# Delete Gallery Image
+def galdelete(request,id):
+    image = get_object_or_404(Gallery, id=id)
+    image.delete()
+    messages.warning(request, 'Image Delete Succesfully.')
+    return redirect("/Gallery")
+
 # Lead Bussiness
 def leadbussiness(request):
     user = request.COOKIES.get("user")
@@ -700,11 +743,11 @@ def leadbussiness(request):
 
 # Appointments
 
-def appointments(request, id):
+def appointments(request):
     if request.method == 'POST':
         date = request.POST.get('date')
         time = request.POST.get('time')
-        
+        id = request.POST.get('id')
         user = request.COOKIES.get('user')
         userdetails = Signup.objects.get(email=user)
         appoint = Appointment(
@@ -715,7 +758,10 @@ def appointments(request, id):
             time = time 
         )
         appoint.save()
-        messages.success(request, 'Business data added successfully!')
-        return redirect("/bussiness/" + str(id))
+        response_data = {
+                'status': 'success'
+            }
+            
+        return JsonResponse(response_data)
     else:
         return redirect("/dashboard")

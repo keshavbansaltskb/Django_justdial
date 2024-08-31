@@ -6,18 +6,27 @@
             cursor: pointer;
             padding: 0 2px;
         }
-       
-  
+        .fa{
+            cursor:pointer;
+        }
+        .fa-edit{
+            margin-right:10px;
+            color:skyblue;
+        }
+        .fa-trash{
+            margin-right:10px;
+            color:red;
+        }
     </style>
     <script>
-        $(document).ready(function(){
-            $(".headtitle").text("{{bus.title}}");
-            var link = document.createElement('link');
-            link.rel = 'icon';
-            link.type = 'icon';
-            link.href = '{{bus.image.url}}';
-            document.head.appendChild(link);
-        });
+    $(document).ready(function(){
+        $(".headtitle").text("{{bus.title}}");
+        var link = document.createElement('link');
+        link.rel = 'icon';
+        link.type = 'icon';
+        link.href = '{{bus.image.url}}';
+        document.head.appendChild(link);
+    });
     </script>
     <div class="modal fade" id="AppointmentModel">
         <div class="modal-dialog  modal-dialog-centered">
@@ -27,24 +36,63 @@
               <h4 class="modal-title">Appointment </h4>
               <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <form method="post" action="/appointment/{{bus.id}}">
-                {% csrf_token %}    
-                <div class="modal-body">
-                    <label><b>Date: </b></label>
-                    <input type="date" class="form-control" required name="date"   placeholder="Select Date">
-                    <br>
-                    <label><b>Time: </b></label>
-                    <input type="time" class="form-control" required  name="time"   placeholder="Select Date">
-                </div>
+            <div class="modal-body">
+                <label><b>Date: </b></label>
+                    <input type="date" class="form-control appotdate" required name="date"   placeholder="Select Date">
+                <br>
+                <label><b>Time: </b></label>
+                <input type="time" class="form-control appottime" required  name="time"   placeholder="Select Date">
+            </div>
         
-                <div class="modal-footer">
+            <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-            </form>
+                <button type="submit" class="btn btn-primary sendappointment"  id="{{bus.id}}">Submit</button>
+            </div>
           </div>
         </div>
     </div>
+
+    <div class="modal fade" id="GalleryModel">
+        <div class="modal-dialog  modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title"> <b>{{bus.title}}</b></h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+            <div class="modal-body">
+               <img src="" id="imgshowgal" class="img-fluid">
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="modal fade" id="shareModel">
+        <div class="modal-dialog  modal-dialog-centered">
+          <div class="modal-content">
+      
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Your Review </h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <label>Rating</label>
+                <div class="rating">
+                    <span class="bx bx-star ratingstar" number="1"></span>
+                    <span class="bx bx-star ratingstar" number="2"></span>
+                    <span class="bx bx-star ratingstar" number="3"></span>
+                    <span class="bx bx-star ratingstar" number="4"></span>
+                    <span class="bx bx-star ratingstar" number="5"></span>
+                </div>
+                <input type="hidden" id="rating-value" value="0"><br>
+                <textarea placeholder="Write Here" id="replymessage" class="form-control" rows="5"></textarea>
+                <label class="errormessage" style="color:red"></label><br>
+                <button class="w3-btn btn-primary sharereplymodel" id="{{bus.id}}">Update Review</button>
+            </div>
+            
+          </div>
+        </div>
+    </div>
+
+    
         <div class="container"  style="margin-top:100px">
         <div class="row">
             {% if bus %}
@@ -85,17 +133,25 @@
                             Chat
                         </button>
                     </a>
-                    {% if bussinesscategory  and user %}
+                    {% if bussinesscategory %}
                         {% if appointmentsbook %}
-                        <button class="w3-button" style="font-size:15px;border:1px solid #000;color:black;margin-bottom:10px"  data-toggle="modal" data-target="#AppointmentModel">
-                            <i class='bx bx-plus-medical' style="cursor:pointer"></i> Appointment
-                        </button>
+                            {% if user %}
+                                <button class="w3-button" style="font-size:15px;border:1px solid #000;color:black;margin-bottom:10px"  data-toggle="modal" data-target="#AppointmentModel">
+                                    <i class='bx bx-plus-medical' style="cursor:pointer"></i> Appointment
+                                </button>
+                            {% else %}
+                            <button class="w3-button usernotAppointment" style="font-size:15px;border:1px solid #000;color:black;margin-bottom:10px">
+                                <i class='bx bx-plus-medical' style="cursor:pointer"></i> Appointment
+                            </button>
+                            {% endif %}
                         {% else %}
                         <button class="w3-btn btn-danger" style="margin-bottom:10px">
                             <i class='bx bx-plus-medical' style="cursor:pointer"></i> Appointment Booked
                         </button>
                         {% endif %}
                     {% endif %}
+                    <br>
+                    <label style="display:none;color:red" class="usernotAppointmentshow">You are not logged in. <a href='/login' style="color:blue">Login</a></label>
                     <br><br>
                 </div>
                 <div class="col-lg-4">
@@ -130,7 +186,7 @@
                     {% for img in gallery %}
 
                         <div class="col-lg-4 col-md-4 col-sm-6" style="margin-bottom:10px">
-                            <img src="{{img.image.url}}" class="img-fluid" style="width:100%;height:300px">
+                            <img src="{{img.image.url}}"  data-toggle="modal" data-target="#GalleryModel" class="img-fluid showgalleryimage" style="width:100%;height:300px;cursor:pointer">
                         </div>
                     {% endfor %}
                 {% endif %}
@@ -164,8 +220,8 @@
                                 <span class="bx bx-star ratingstar" number="4"></span>
                                 <span class="bx bx-star ratingstar" number="5"></span>
                             </div>
-                            <input type="hidden" id="rating-value"  value="0"><br>
-                            <textarea placeholder="Write Here" id="replymessage" class="form-control" rows="5"></textarea>
+                            <input type="hidden" id="rating-valueee"  value="0"><br>
+                            <textarea placeholder="Write Here" id="replymessageee" class="form-control" rows="5"></textarea>
                             
                             <label class="errormessage" style="color:red"></label><br>
                             <button class="w3-btn btn-primary sharereply" id="{{bus.id}}">Post Review</button>
@@ -180,7 +236,7 @@
                         
                             {% for msg in messages %}
                             <div class="row" style="margin-top: 20px; padding: 20px; border-radius: 10px; border: 1px solid #f2f2f2;">
-                                <div class="col-lg-12">
+                                <div class="col-lg-10">
                                     <label style="font-size: 20px; font-family: sans-serif;">Name : <span style="font-weight: 100;">{{msg.user}}</span></label>
                                     <br>
                                     <label style="font-size: 15px;">Rating :
@@ -193,8 +249,13 @@
                                     {% endfor %}
                                     </label><br>
                                     <label style="font-size: 15px;">Message :  <span style="font-weight: 100;">{{msg.message}}</span></label><br>
-                                    
                                 </div>
+                                <div class="col-lg-2">
+                                    {% if user == msg.email %}
+                                        <i class="fa fa-edit reviewedit" data-toggle="modal" data-target="#shareModel" id="{{msg.id}}" rating="{{msg.rating}}" msg="{{msg.message}}"></i>
+                                    {% endif %}
+                                </div>
+                                
                             </div>
 
                         {% endfor %}
@@ -205,7 +266,7 @@
                         {% if messages.has_next %}
                             <div class="row">
                                 <div class="col-lg-12 text-center" style="margin-top:50px">
-                                    <button class="w3-btn btn-primary loadmore" id="{{bus.id}}" style="cursor: pointer;">Load More...</button>
+                                    <button class="w3-btn btn-primary loadmore" id="{{bus.id}}" user="{{user}}" style="cursor: pointer;">Load More...</button>
                                 </div>
                             </div>
                         {% endif %}
@@ -219,6 +280,95 @@
         </div>
     </div>
     <script>
+        $(document).on("click",".showgalleryimage",function(){
+            var src = $(this).attr("src");
+            $("#imgshowgal").attr("src",src);
+        });
+        
+        var bid = "";
+        $(document).on("click",".reviewedit",function(){
+            bid = $(this).attr("id");
+            var rating = $(this).attr("rating");
+            var message = $(this).attr("msg");
+            $('#replymessage').val(message);
+
+            $('.ratingstar').each(function() {
+                var starNumber = $(this).attr('number');
+                if (starNumber <= rating) {
+                    $(this).removeClass('bx-star').addClass('bxs-star').css('color', 'blue');
+                } else {
+                    $(this).removeClass('bxs-star').addClass('bx-star').css('color', 'black'); 
+                }
+            });
+            $('#rating-value').val(rating);
+
+        });
+
+        $(document).on("click", ".sharereplymodel", function() {
+            var rating = $("#rating-value").val();
+            var message = $("#replymessage").val();
+            var businessId =  $(this).attr("id");
+            var cid = bid;
+            
+            if (rating != 0 && message.trim() !== "") {
+                $.ajax({
+                    url: "/updatereply",
+                    method: "POST",
+                    data: {
+                        rating: rating,
+                        message: message,
+                        business_id: businessId,
+                        cid : bid,
+                        csrfmiddlewaretoken: csrftoken
+                    },
+                    success: function(response) {
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        $(".errormessage").css("color","red");
+                        $(".errormessage").html("You are not logged in. <a href='/login'>Login</a>");
+                    }
+                });
+            } else {
+                $(".errormessage").css("color","red");
+                $(".errormessage").text("Rating and Message should have a value.");
+            }
+        });
+
+        
+        $(document).on("click",".usernotAppointment",function(){
+            $(".usernotAppointmentshow").css("display","block");
+        });
+
+        $(document).on("click",".sendappointment",function(){
+            var date = $(".appotdate").val();
+            var time = $(".appottime").val();
+            if(date && time){
+                var businessId = $(this).attr("id");
+                var selectedDateTime = new Date(date + 'T' + time);
+                var currentDateTime = new Date();
+
+                if (selectedDateTime < currentDateTime) {
+                    alert("Please select a future date and time.");
+                } else {
+                    $.ajax({
+                        url: "/appointment",
+                        method: "POST",
+                        data: {
+                            date: date,
+                            time: time,
+                            id:businessId,
+                            csrfmiddlewaretoken: csrftoken
+                        },
+                        success: function(response) {
+                            location.reload();
+                        }
+                    });
+                }
+            }else{
+                alert("All Filed Required");
+            }
+        });
         var csrftoken = "{{ csrf_token }}";
         $(document).ready(function() {
             
@@ -250,8 +400,8 @@
             });
             $(document).on('click', '.ratingstar', function() {
                 var number = parseInt($(this).attr('number'));
+                $('#rating-valueee').val(number);
                 $('#rating-value').val(number);
-
                 $('.ratingstar').each(function() {
                     var starNumber = parseInt($(this).attr('number'));
                     if (starNumber <= number) {
@@ -265,12 +415,10 @@
             });
 
         });
-        
         $(document).on("click", ".sharereply", function() {
-            var rating = $("#rating-value").val();
-            var message = $("#replymessage").val();
+            var rating = $("#rating-valueee").val();
+            var message = $("#replymessageee").val();
             var businessId = $(this).attr("id");
-            
             if (rating != 0 && message.trim() !== "") {
                 $.ajax({
                     url: "/sharereply",
@@ -327,10 +475,9 @@
         });
         $(document).ready(function() {
             var page = 2;
-
             $(".loadmore").click(function() {
                 var id = $(this).attr("id");
-                
+                var user = $(this).attr("user");
                 $.ajax({
                     url: "/loadmore",
                     method: "POST",
@@ -344,22 +491,32 @@
                             response.data.forEach(function(msg) {
                                 var htmlContent =
                                     "<div class='row' style='margin-top: 20px; padding: 20px; border-radius: 10px; border: 1px solid #f2f2f2;'>" +
-                                        "<div class='col-lg-12'>" +
+                                        "<div class='col-lg-10'>" +
                                             "<label style='font-size: 20px; font-family: sans-serif;'>Name : <span style='font-weight: 100;'>" + msg.name + "</span></label>" +
                                             "<br>" +
                                             "<label style='font-size: 15px;'>Rating : ";
-                                        for (var star = 0; star < 5; star++) {
-                                            htmlContent += "<i class='bx " + (star < msg.rating ? "bxs-star" : "bx-star") + "' style='color: " + (star < msg.rating ? "#FFD700;" : "black;") + "'></i> ";
-                                        }
-
-                                        htmlContent +=
+                                            for (var star = 0; star < 5; star++) {
+                                                htmlContent += "<i class='bx " + (star < msg.rating ? "bxs-star" : "bx-star") + "' style='color: " + (star < msg.rating ? "#FFD700;" : "black;") + "'></i> ";
+                                            }
+                                            htmlContent +=
                                             "</label><br>" +
                                             "<label style='font-size: 15px;'>Message : <span style='font-weight: 100;'>" + msg.message + "</span></label><br>" +
-                                            "<label style='font-size: 15px;'>Email : <span style='font-weight: 100;'>" + msg.email + "</span></label>" +
-                                        "</div>" +
+                                        "</div>";
+                                            
+                                        if (user == msg.email) {
+                                            htmlContent +=
+                                                "<div class='col-lg-2'>" +
+                                                    "<i class='fa fa-edit reviewedit' data-toggle='modal' data-target='#shareModel' id='" + msg.id + "' rating='" + msg.rating + "' msg='" + msg.message + "'></i>" +
+                                                "</div>";
+                                        }
+                                        
+                                htmlContent +=
                                     "</div>";
+                            
                                 $(".data").append(htmlContent);
                             });
+                            
+                            
 
                             page += 1;
                             if (!response.has_next) {
@@ -376,6 +533,7 @@
             });
         });
 
+        
         const slides = document.querySelectorAll('#slideshow .slide-img');
         let currentSlide = 0;
         function showSlide(index) {
@@ -389,6 +547,8 @@
         }
         showSlide(currentSlide);
         setInterval(nextSlide, 3000);
+
+        
     </script>
     
 {% endblock main %}

@@ -1,5 +1,25 @@
 {% extends "master1.html" %}
 {% block maincontent %}
+<div class="modal fade" id="GalleryModel">
+    <div class="modal-dialog  modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title"> <b>{{bus.title}}</b></h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+        <div class="modal-body">
+           <img src="" id="imgshowgal" class="img-fluid">
+        </div>
+      </div>
+    </div>
+</div>
+<script>
+    $(document).on("click",".showgalleryimage",function(){
+        var src = $(this).attr("src");
+        $("#imgshowgal").attr("src",src);
+    });
+
+</script>
     <div class="row">
         <div class="col-lg-12">
             <center><label style="font-size:20px;font-weight:bold">Gallery </label></center>
@@ -18,7 +38,7 @@
                 {% csrf_token %}
                 <div class="form-group">
                     <label  style="font-size:20px"><b>Upload Image</b></label>
-                    <input type="file" class="form-control-file" id="image" name="image" >
+                    <input type="file" class="form-control-file" id="image" name="image" required>
                 </div>
                 <input type="submit" class="btn btn-primary" value="Submit">
             </form>
@@ -31,7 +51,13 @@
             </div>
             {% for img in gallery %}
                 <div class="col-lg-4">
-                    <img src="{{ img.image.url }}" class="img-fluid">
+                    <img src="{{ img.image.url }}"  data-toggle="modal" data-target="#GalleryModel"  class="img-fluid showgalleryimage" style="cursor:pointer">
+                    <div class="text-center">
+                        <br>
+                        <a href="/galdelete/{{img.id}}">
+                            <button class="btn btn-danger">Delete</button>
+                        </a>
+                    </div>
                 </div>
             {% endfor %}
         {% else %}
@@ -41,3 +67,4 @@
         {% endif %}
     </div>
 {% endblock maincontent %}
+

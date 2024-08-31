@@ -54,7 +54,7 @@ footer p { font-size:13px; color:#CCC; padding-bottom:0px; margin-bottom:8px;}
     <ul class="footer_ul_amrc">
         {% if categoriesfooter %}
             {% for cat in categoriesfooter %}
-                <li><a href="category/{{cat.id}}">{{cat.category}}</a></li>
+                <li><a href="/category/{{cat.id}}">{{cat.category}}</a></li>
             {% endfor %}
         {% endif %}
     </ul>
@@ -68,7 +68,7 @@ footer p { font-size:13px; color:#CCC; padding-bottom:0px; margin-bottom:8px;}
     <ul class="footer_ul_amrc">
         {% if busssinessfooter %}
             {% for bus in busssinessfooter %}
-                <li><a href="bussiness/{{bus.id}}">{{bus.title}}</a></li>
+                <li><a href="/bussiness/{{bus.id}}">{{bus.title}}</a></li>
             {% endfor %}
         {% endif %}
     </ul>

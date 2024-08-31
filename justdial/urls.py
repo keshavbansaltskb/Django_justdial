@@ -54,6 +54,7 @@ urlpatterns = [
 
     # Comment and rating url 
     path('sharereply',views.sharereply),
+    path('updatereply',views.updatereply),
 
     # Add District 
     path("adddistrict",views.adddistrict),
@@ -80,12 +81,13 @@ urlpatterns = [
     # Gallery
     path("Gallery",views.gallery),
     path("galleryimg",views.galleryimg),
+    path("galdelete/<int:id>",views.galdelete),
 
     # Bussiness Lead
     path("leadbussiness",views.leadbussiness),
 
     # Appointment
-    path("appointment/<int:id>",views.appointments),
+    path("appointment",views.appointments),
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

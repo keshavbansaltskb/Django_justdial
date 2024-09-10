@@ -117,10 +117,12 @@
                     <label style="font-size:15px;font-family:sans-serif;color:green;"> Open {{bus.open_until}} |</label>
                     <label style="font-size:15px;font-family:sans-serif;color:green;">{{bus.experience}} years in bussiness</label>
                     <br>
-                    <button class="w3-btn w3-teal" style="margin-bottom:10px">
-                        <i class="bx bx-phone" style="cursor:pointer;font-size:20px"></i> 
-                        {{ bus.contact_number }}
-                    </button>
+                    <a href="tel:{{bus.contact_number}}">
+                        <button class="w3-btn w3-teal" style="margin-bottom:10px">
+                            <i class="bx bx-phone" style="cursor:pointer;font-size:20px"></i> 
+                                {{ bus.contact_number }}
+                        </button>
+                    </a>
                     <a href="#messagereply">
                         <button class="w3-button"  style="font-size:15px;border:1px solid #000;color:black;margin-bottom:10px">
                             <i class='bx bx-star' style="cursor:pointer"></i>
